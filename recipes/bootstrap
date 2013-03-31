@@ -15,7 +15,7 @@ function defaults_bootstrap {
 	
 	FTP_USER_NAME=""
 	FTP_USER_PASSWORD=""
-	FTP_USER_GROUP=""
+	FTP_USER_GROUP="ftpusers"
 
 	CONFIG_PATH="$ROOT_PATH/conf_files"
 }
