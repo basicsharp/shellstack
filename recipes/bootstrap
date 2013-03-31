@@ -4,7 +4,7 @@ source "$LIB_PATH/hostname.sh"
 source "$LIB_PATH/user.sh"
 source "$LIB_PATH/security.sh"
 
-function defaults_basic {
+function defaults_bootstrap {
 	#TODO: verify if vars are set and then use defautls our get 'em another way
 	HOST_NAME=""
 	TIMEZONE="UTC"
@@ -20,7 +20,7 @@ function defaults_basic {
 	CONFIG_PATH="$ROOT_PATH/conf_files"
 }
 
-function install_basic {
+function install_bootstrap {
 	upgrade_system
 	install_essentials
 	set_hostname $HOST_NAME
