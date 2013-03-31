@@ -21,15 +21,15 @@ function defaults_bootstrap {
 }
 
 function install_bootstrap {
-	upgrade_system
-	install_essentials
+	upgrade_system_alt
+	#install_essentials
 	set_hostname $HOST_NAME
 	set_timezone $TIMEZONE
 	update_locale_en_US_UTF_8
 	create_deploy_user $USER_NAME $USER_PASSWORD "$USER_SSH_KEY"
 	set_basic_security_alt
 
-	install_vsftpd FTP_USER_NAME FTP_USER_PASSWORD FTP_USER_GROUP
+	install_vsftpd $FTP_USER_NAME $FTP_USER_PASSWORD $FTP_USER_GROUP
 	download_server_shield $USER_NAME
 	download_vladgh_lemp $USER_NAME
 	install_webmin
@@ -38,6 +38,13 @@ function install_bootstrap {
 
 
 ##########Functions##########
+function upgrade_system_alt {
+	log "Upgrading System..."
+	apt-get update
+	apt-get -y install aptitude
+	#aptitude -y full-upgrade
+}
+
 function set_timezone {
 	ln -sf /usr/share/zoneinfo/$1 /etc/localtime
 }
@@ -46,7 +53,7 @@ function set_basic_security_alt {
 	log "Setting up basic security..."
 	install_fail2ban
 	install_ufw
-	basic_ufw_setup
+	#basic_ufw_setup
 	sshd_permit_root_login No
 	sshd_password_authentication Yes
 	/etc/init.d/ssh restart
