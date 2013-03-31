@@ -1,0 +1,100 @@
+#!/bin/bash
+source "$LIB_PATH/utils.sh"
+source "$LIB_PATH/hostname.sh"
+source "$LIB_PATH/user.sh"
+source "$LIB_PATH/security.sh"
+
+function defaults_basic {
+	#TODO: verify if vars are set and then use defautls our get 'em another way
+	HOST_NAME=""
+	TIMEZONE="UTC"
+
+	USER_NAME=""
+	USER_PASSWORD=""
+	USER_SSH_KEY="" #ssh-rsa paste here your ~/.ssh/id_rsa.pub
+	
+	FTP_USER_NAME=""
+	FTP_USER_PASSWORD=""
+	FTP_USER_GROUP=""
+
+	CONFIG_PATH="$ROOT_PATH/conf_files"
+}
+
+function install_basic {
+	upgrade_system
+	install_essentials
+	set_hostname $HOST_NAME
+	set_timezone $TIMEZONE
+	update_locale_en_US_UTF_8
+	create_deploy_user $USER_NAME $USER_PASSWORD "$USER_SSH_KEY"
+	set_basic_security_alt
+
+	install_vsftpd FTP_USER_NAME FTP_USER_PASSWORD FTP_USER_GROUP
+	download_server_shield $USER_NAME
+	download_vladgh_lemp $USER_NAME
+	install_webmin
+	install_glances
+}
+
+
+##########Functions##########
+function set_timezone {
+	ln -sf /usr/share/zoneinfo/$1 /etc/localtime
+}
+
+function set_basic_security_alt {
+	log "Setting up basic security..."
+	install_fail2ban
+	install_ufw
+	basic_ufw_setup
+	sshd_permit_root_login No
+	sshd_password_authentication Yes
+	/etc/init.d/ssh restart
+}
+
+function install_vsftpd {
+	#$1 - USERNAME
+	#$2 - PASSWORD
+	#$3 - GROUP
+	aptitude -y install git screen yum vsftpd
+	cp $CONFIG_PATH/vsftpd.conf /etc/vsftpd.conf
+	add_user $1 $2 $3
+	add_ssh_key $1 ""
+	sudo service vsftpd restart
+}
+
+function download_server_shield {
+	#$1 - USERNAME
+	USER_HOME=$(user_home "$1")
+	git clone git://github.com/bluedragonz/server-shield.git $USER_HOME/server-shield
+	sed -i.bak -e 's/yum --security/yum/g' $USER_HOME/server-shield/sshield
+	chmod +x $USER_HOME/server-shield/sshield
+	cp $USER_HOME/server-shield/sshield /etc/init.d/sshield
+	chown -hR $1 $USER_HOME/server-shield
+}
+
+function download_vladgh_lemp {
+	#$1 - USERNAME
+	USER_HOME=$(user_home "$1")
+	git clone git://github.com/vladgh/VladGh.com-LEMP.git $USER_HOME/VladGh.com-LEMP
+	sed -i.bak -e 's/start-stop-daemon/\/sbin\/start-stop-daemon/g' $USER_HOME/VladGh.com-LEMP/init_files/nginx
+	chown -hR $USER_NAME $USER_HOME/VladGh.com-LEMP
+	# Replace nginx.conf, default site
+	cp $CONFIG_PATH/nginx.conf $USER_HOME/VladGh.com-LEMP/conf_files/nginx.conf
+	cp $CONFIG_PATH/default $USER_HOME/VladGh.com-LEMP/conf_files/default
+}
+
+function install_webmin {
+	echo "deb http://download.webmin.com/download/repository sarge contrib" >> /etc/apt/sources.list
+	echo "deb http://webmin.mirror.somersettechsolutions.co.uk/repository sarge contrib" >> /etc/apt/sources.list
+	wget -P /root/ http://www.webmin.com/jcameron-key.asc
+	apt-key add /root/jcameron-key.asc
+	apt-get update
+	apt-get install webmin
+}
+
+function install_glances {
+	add-apt-repository ppa:arnaud-hartmann/glances-stable
+	apt-get update
+	apt-get install glances
+}
