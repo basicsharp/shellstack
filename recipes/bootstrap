@@ -57,7 +57,7 @@ function set_basic_security_alt {
 	#basic_ufw_setup
 	sshd_permit_root_login No
 	sshd_password_authentication Yes
-	/etc/init.d/ssh restart
+	service ssh restart
 }
 
 function install_vsftpd {
@@ -66,6 +66,7 @@ function install_vsftpd {
 	#$3 - GROUP
 	aptitude -y install git screen yum vsftpd
 	cp $CONFIG_PATH/vsftpd.conf /etc/vsftpd.conf
+	groupadd $3
 	add_user $1 $2 $3
 	add_ssh_key $1 ""
 	sudo service vsftpd restart
