@@ -21,6 +21,7 @@ function defaults_bootstrap {
 }
 
 function install_bootstrap {
+	defaults_bootstrap
 	upgrade_system_alt
 	#install_essentials
 	set_hostname $HOST_NAME
