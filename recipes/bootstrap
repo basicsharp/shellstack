@@ -30,8 +30,8 @@ function install_bootstrap {
 	create_deploy_user $USER_NAME $USER_PASSWORD "$USER_SSH_KEY"
 	set_basic_security_alt
 
-	#install_vsftpd $FTP_USER_NAME $FTP_USER_PASSWORD $FTP_USER_GROUP
-	set_sftp $FTP_USER_NAME $FTP_USER_PASSWORD $FTP_USER_GROUP
+	#install_vsftpd $SFTP_USER_NAME $FTP_USER_PASSWORD $SFTP_USER_GROUP
+	set_sftp $SFTP_USER_NAME $SFTP_USER_PASSWORD $SFTP_USER_GROUP
 	download_server_shield $USER_NAME
 	download_vladgh_lemp $USER_NAME
 	install_webmin
@@ -112,24 +112,24 @@ function install_webmin {
 	echo "deb http://webmin.mirror.somersettechsolutions.co.uk/repository sarge contrib" >> /etc/apt/sources.list
 	wget -P /root/ http://www.webmin.com/jcameron-key.asc
 	apt-key add /root/jcameron-key.asc
-	apt-get update
-	apt-get install webmin
+	apt-get -y update
+	apt-get -y install webmin
 }
 
 function install_glances {
 	add-apt-repository ppa:arnaud-hartmann/glances-stable
-	apt-get update
-	apt-get install glances
+	apt-get -y update
+	apt-get -y install glances
 }
 
 function install_zsh {
-	apt-get install zsh
+	apt-get -y install zsh
 }
 
 function install_ntp {
-	sudo apt-get install ntp ntpdate
+	sudo apt-get -y install ntp ntpdate
 }
 
 function install_benchmark_tools {
-	sudo apt-get install siege apache2-utils htop
+	sudo apt-get -y install siege apache2-utils htop
 }
