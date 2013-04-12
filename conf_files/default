@@ -3,18 +3,25 @@ server {
   listen [::]:80 ipv6only=on; # listen for IPv6 only traffic on IPv6 sockets
   listen 80; # listen also for IPv4 traffic on "regular" IPv4 sockets
 
-  server_name _ "" server;
+  server_name SERVER_NAME;
 
   access_log  /var/log/nginx/$host.access.log;
   error_log   /var/log/nginx/error.log;
 
-  root    /home/sites/server;
+  root    /home/sites/;
   index   index.php index.html;
 
-  ## Block bad bots
-  #if ($http_user_agent ~* (HTTrack|HTMLParser|libcurl|discobot|Exabot|Casper|kmccrew|plaNETWORK|RPT-HTTPClient)) {
-  #  return 444;
-  #}
+  port_in_redirect off;
+  server_tokens    off;
+  autoindex        off;
+
+  client_max_body_size    15m;
+  client_body_buffer_size 128k;
+
+  # Block bad bots
+  if ($http_user_agent ~* (HTTrack|HTMLParser|libcurl|discobot|Exabot|Casper|kmccrew|plaNETWORK|RPT-HTTPClient)) {
+    return 444;
+  }
 
   ## Block certain Referers (case insensitive)
   if ($http_referer ~* (sex|vigra|viagra) ) {
@@ -23,7 +30,9 @@ server {
 
   ## Deny dot files:
   location ~ /\. {
-    deny all;
+    deny          all;
+    access_log    off;
+    log_not_found off;
   }
 
   ## Favicon Not Found
@@ -42,20 +51,38 @@ server {
     try_files $uri $uri/ index.php;
   }
 
-  #location /img/ {
-  #  autoindex on;
-  #}
-
+  # Zero-day exploit defense.
+  # http://forum.nginx.org/read.php?2,88845,page=3
   location ~ \.php$ {
+    try_files $uri =404;
+    fastcgi_split_path_info ^(.+\.php)(/.+)$;
+    include /etc/nginx/fastcgi.conf;
     fastcgi_index index.php;
     fastcgi_param SCRIPT_FILENAME $document_root/$fastcgi_script_name;
-    include /etc/nginx/fastcgi.conf;
     fastcgi_pass unix:/var/run/php5-fpm.sock;
+    #fastcgi_buffers             256 16k;
+    #fastcgi_intercept_errors    on;
+    fastcgi_ignore_client_abort  off;
+    fastcgi_connect_timeout      60;
+    fastcgi_send_timeout         180;
+    fastcgi_read_timeout         180;
+    fastcgi_buffer_size          128k;
+    fastcgi_buffers              4 256k;
+    fastcgi_busy_buffers_size    256k;
+    fastcgi_temp_file_write_size 256k;
   }
+  #location ~ \.php$ {
+  #  fastcgi_param SCRIPT_FILENAME $document_root/$fastcgi_script_name;
+  #  fastcgi_index index.php;
+  #  include /etc/nginx/fastcgi.conf;
+  #  fastcgi_pass unix:/var/run/php5-fpm.sock;
+  #  fastcgi_buffers 256 16k;
+  #}
+
 
   ### NginX Status
   location /nginx_status {
-  stub_status on;
+    stub_status on;
     access_log   off;
   }
 
@@ -71,3 +98,4 @@ server {
   }
 
 }
+

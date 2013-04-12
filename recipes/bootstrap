@@ -36,6 +36,9 @@ function install_bootstrap {
 	download_vladgh_lemp $USER_NAME
 	install_webmin
 	install_glances
+	install_zsh
+	install_ntp
+	install_benchmark_tools
 }
 
 
@@ -101,6 +104,7 @@ function download_vladgh_lemp {
 	# Replace nginx.conf, default site
 	cp $CONFIG_PATH/nginx.conf $USER_HOME/VladGh.com-LEMP/conf_files/nginx.conf
 	cp $CONFIG_PATH/default $USER_HOME/VladGh.com-LEMP/conf_files/default
+	cp $CONFIG_PATH/php-fpm.conf $USER_HOME/VladGh.com-LEMP/conf_files/php-fpm.conf
 }
 
 function install_webmin {
@@ -116,4 +120,16 @@ function install_glances {
 	add-apt-repository ppa:arnaud-hartmann/glances-stable
 	apt-get update
 	apt-get install glances
+}
+
+function install_zsh {
+	apt-get install zsh
+}
+
+function install_ntp {
+	sudo apt-get install ntp ntpdate
+}
+
+function install_benchmark_tools {
+	sudo apt-get install siege apache2-utils htop
 }
