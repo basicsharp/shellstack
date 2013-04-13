@@ -17,6 +17,9 @@ function defaults_bootstrap {
 	SFTP_USER_PASSWORD=""
 	SFTP_USER_GROUP="sftpusers"
 
+	SITES_USER_NAME="sites"
+	SITES_USER_PASSWORD=""
+
 	CONFIG_PATH="$ROOT_PATH/conf_files"
 }
 
@@ -31,7 +34,8 @@ function install_bootstrap {
 	set_basic_security_alt
 
 	#install_vsftpd $SFTP_USER_NAME $FTP_USER_PASSWORD $SFTP_USER_GROUP
-	set_sftp $SFTP_USER_NAME $SFTP_USER_PASSWORD $SFTP_USER_GROUP
+	add_user_and_group $SFTP_USER_NAME $SFTP_USER_PASSWORD $SFTP_USER_GROUP
+	add_sites_user $SITES_USER_NAME $SITES_USER_PASSWORD
 	download_server_shield $USER_NAME
 	download_vladgh_lemp $USER_NAME
 	install_webmin
@@ -64,13 +68,20 @@ function set_basic_security_alt {
 	service ssh restart
 }
 
-function set_sftp {
+function add_user_and_group {
 	#$1 - USERNAME
 	#$2 - PASSWORD
 	#$3 - GROUP
 	groupadd $3
 	add_user $1 $2 $3
 	add_ssh_key $1 ""
+}
+
+function add_sites_user {
+	#$1 - USERNAME
+	#$2 - PASSWORD
+	useradd --create-home --user-group "$1"
+	echo "$1:$2" | chpasswd
 }
 
 function install_vsftpd {
