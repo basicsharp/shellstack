@@ -117,7 +117,7 @@ function install_webmin {
 }
 
 function install_glances {
-	add-apt-repository ppa:arnaud-hartmann/glances-stable
+	add-apt-repository -y ppa:arnaud-hartmann/glances-stable
 	apt-get -y update
 	apt-get -y install glances
 }
