@@ -127,9 +127,9 @@ function install_zsh {
 }
 
 function install_ntp {
-	sudo apt-get -y install ntp ntpdate
+	apt-get -y install ntp ntpdate
 }
 
 function install_benchmark_tools {
-	sudo apt-get -y install siege apache2-utils htop
+	apt-get -y install siege apache2-utils htop
 }
