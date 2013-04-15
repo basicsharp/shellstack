@@ -43,6 +43,7 @@ function install_bootstrap {
 	install_zsh
 	install_ntp
 	install_benchmark_tools
+	install_composer
 }
 
 
@@ -143,4 +144,9 @@ function install_ntp {
 
 function install_benchmark_tools {
 	apt-get -y install siege apache2-utils htop
+}
+
+function install_composer {
+	curl -sS https://getcomposer.org/installer | php
+	mv composer.phar /usr/local/bin/composer
 }
