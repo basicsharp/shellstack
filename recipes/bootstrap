@@ -13,9 +13,9 @@ function defaults_bootstrap {
 	USER_PASSWORD=""
 	USER_SSH_KEY="" #ssh-rsa paste here your ~/.ssh/id_rsa.pub
 	
-	SFTP_USER_NAME=""
-	SFTP_USER_PASSWORD=""
-	SFTP_USER_GROUP="sftpusers"
+	# SFTP_USER_NAME=""
+	# SFTP_USER_PASSWORD=""
+	# SFTP_USER_GROUP="sftpusers"
 
 	SITES_USER_NAME="sites"
 	SITES_USER_PASSWORD=""
@@ -34,7 +34,7 @@ function install_bootstrap {
 	set_basic_security_alt
 
 	#install_vsftpd $SFTP_USER_NAME $FTP_USER_PASSWORD $SFTP_USER_GROUP
-	add_user_and_group $SFTP_USER_NAME $SFTP_USER_PASSWORD $SFTP_USER_GROUP
+	# add_user_and_group $SFTP_USER_NAME $SFTP_USER_PASSWORD $SFTP_USER_GROUP
 	add_sites_user $SITES_USER_NAME $SITES_USER_PASSWORD
 	download_server_shield $USER_NAME
 	download_vladgh_lemp $USER_NAME
